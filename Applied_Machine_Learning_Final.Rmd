@@ -1,0 +1,46 @@
+title: \| \| ECON 491 - Applied Machine Learning in Economics \| Final Project(100pts) - due date: Thursday, April 27th author: "Nonso Osamor (cosamor2) & Victoria Nuñez (netID)" date: "04/27/2023" output: html_document ---
+
+------------------------------------------------------------------------
+
+# Introduction:
+
+The ongoing COVID-19 pandemic has resulted in a significant increase in unemployment rates across various industries in the United States. The pandemic-induced layoffs have raised concerns about the labor market's future, prompting researchers to explore new ways of analyzing past trends to forecast future employment rates. The objective of this project is to employ machine learning techniques to develop a model that can predict the expected unemployment rate percentage for different labor industries in 2023 based on historical data provided by the U.S. Bureau of Labor Statistics (BLS).
+
+Why Machine Learning can be helpful: Machine learning algorithms can assist in uncovering hidden patterns in vast amounts of historical data, identifying underlying factors that influence employment trends. By training a machine learning model on past employment trends, we can create a robust predictive model capable of forecasting the expected unemployment rate percentage for each labor industry. This project will employ regression-based statistical models and a supervised machine learning approach to analyze labeled data, which can enhance the accuracy of our predictions. By leveraging machine learning techniques, we can gain valuable insights into the potential economic impacts of current labor market trends and develop evidence-based strategies to mitigate the adverse effects of unemployment.
+
+# Literature:
+
+
+
+
+
+
+
+# Applied:
+
+First we initialize the appropriate packages for working with APIs in order to set up the API request to receive the necessary data. Since the time series data we will be receiving from BLS is in JSON format, we will also input a package responsible for working with this type of data.
+
+```{r}
+library(httr)
+library(jsonlite)
+
+endpoint <- "https://api.bls.gov/publicAPI/v2/timeseries/data/"
+series_id <- "LNS14000000"
+start_year <- "2000"
+end_year <- "2022"
+headers <- list("Content-Type"="application/x-www-form-urlencoded")
+body <- paste0('{"seriesid":["',series_id,'"],"startyear":"',start_year,'", "endyear":"',end_year,'"}')
+response <- POST(url = endpoint, body = body, encode = "json", headers = headers)
+result <- content(response, type = "application/x-www-form-urlencoded")
+
+df <- data.frame(year = as.numeric(unlist(lapply(result$Results$series$observations, function(x) x$year))),
+  month = unlist(lapply(result$Results$series$observations, function(x) x$period)),
+  unemployment_rate = as.numeric(unlist(lapply(result$Results$series$observations, function(x) x$value)))
+)
+
+
+
+
+
+```
+
