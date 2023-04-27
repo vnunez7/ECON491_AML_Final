@@ -33,6 +33,76 @@ Nicolas G. Vaillant, François-Charles Wolff. "Understanding diamond pricing usi
 # Data:
 
 # Applied:
+We are given a trained data set which is what we will be working with in R. Since the file is a csv we do not need to anymore external data conversions, we simply load the data using "read.csv()"
+
+In order to correlate Color, Clarity, and Carat to Retail, we need to check if all the values in those respective columns are numerical values,we do this by using the typeof() function. If they are not we need to manipulate the values further. My implementation of translating the categorical values of Color and Clarity into numerical values an be seen below.
+
+```{r}
+library(dplyr)
+diamonds = read.csv("training.csv")
+View(diamonds)
+
+typeof(diamonds$Retail)
+typeof(diamonds$Carats)
+typeof(diamonds$Clarity)
+typeof(diamonds$Color)
+
+
+diamonds <- diamonds %>%
+  mutate(Clarity_num = case_when(
+    Clarity == "I2" ~ 10,
+    Clarity == "I1" ~ 9,
+    Clarity == "SI2" ~ 8,
+    Clarity == "SI1" ~ 7,
+    Clarity == "VS2" ~ 6,
+    Clarity == "VS1" ~ 5,
+    Clarity == "VVS2" ~ 4,
+    Clarity == "VVS1" ~ 3,
+    Clarity == "IF" ~ 2,
+    Clarity == "FL" ~ 1,
+    TRUE ~ NA_real_
+  ))
+
+
+diamonds <- diamonds %>%
+  mutate(Color_num = case_when(
+    Color == "Z" ~ 23,
+    Color == "Y" ~ 22,
+    Color == "X" ~ 21,
+    Color == "W" ~ 20,
+    Color == "V" ~ 19,
+    Color == "U" ~ 18,
+    Color == "T" ~ 17,
+    Color == "S" ~ 16,
+    
+    Color == "R" ~ 15,
+    Color == "Q" ~ 14,
+    Color == "P" ~ 13,
+    Color == "O" ~ 12,
+    Color == "N" ~ 11,
+    
+    Color == "M" ~ 10,
+    Color == "L" ~ 9,
+    Color == "K" ~ 8,
+    
+    Color == "J" ~ 7,
+    Color == "I" ~ 6,
+    Color == "H" ~ 5,
+    Color == "G" ~ 4,
+    
+    Color == "F" ~ 3,
+    Color == "E" ~ 2,
+    Color == "D" ~ 1,
+    TRUE ~ NA_real_
+  ))
+
+
+
+head(diamonds)
+
+
+
+```
 
 # Analysis:
 
