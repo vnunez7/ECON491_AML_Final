@@ -1,16 +1,18 @@
 
 ---
-title: |
-  | ECON 491 - Applied Machine Learning in Economics
-  | Final Project (100pts) - due date: Thursday, April  27th
+title: ""| ECON 491 - Applied Machine Learning in Economics\n| Final Project (100pts)"
+  - due date: Thursday, April  27th\n"
 author: "Nonso Osamor (cosamor2) & Victoria Nuñez (vnunez7)"
 date: "04/22/2023"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ---------------------------------------------------------
 
 # Abstract:
+
 
 This research paper aims to analyze and develop supervised machine learning models that allow us to gain a deeper understanding of the correlation between the physical characteristics of diamonds and the market retail value they hold. In order to further understand the market value of diamonds, we developed several multiple regression models that allow us to understand the influence of shape, carat, symmetry, color, and clarity on the distinct retail cost for the diamond as a commodity. The data set used to construct our model was derived from an outsourcing business client with a need to predict the optimal retail price for particular diamonds based on past sales. The analysis section of our project aims to measure the accuracy of our developed model in predicting an optimal retail price for a diamond product or the commodity itself. The empirical results of our multiple regression models show that there exists a . The results also revealed that the __ of the diamond influences the cost. The implications of this research could emphasize an unspoken criteria between diamond retailers when developing product prices which seem to take diamond characteristics and market value into consideration during the process. Given the numerous characteristics and external market factors that can influence the retail value of a diamond, our research focuses on correlating physical characteristics of the gemstones themselves to the retail cost posted by various retailers. After building multiple regression models and implementing the training data provided, our model built predicts the potential retail cost of a diamond based on the inputted value of its characteristics, which was achieved by implementing a more flexible model that could capture the relationships while using regularization to avoid overfitting to the training data.
 
@@ -106,8 +108,144 @@ head(diamonds)
 
 
 ```
+# Step 2
 
-# Analysis:
+Now that we have translated the aforementioned columns into new numerical ones, we can now see the correlation through the built in correlation matrix in R.
+
+```{r}
+diamonds_numeric = diamonds[,c("Retail", "Carats", "Clarity_num", "Color_num")]
+diamonds_numeric = na.omit(diamonds_numeric)
+cor(diamonds_numeric)
+
+
+```
+
+# Step 3
+
+We will now compute a linear regression model using the above variables in relation to Retail.
+
+```{r}
+diamonds_model = lm(diamonds$Retail ~ diamonds$Carats + diamonds$Clarity_num + diamonds$Color_num, data = diamonds )
+
+summary(diamonds_model)
+
+
+
+```
+
+
+# Step 4
+
+We will now read the offers file into R and make any adjustments needed to apply the linear model in order to choose which diamonds we will make an offer on.
+
+In order to make sure the offers file is in the right format for the linear regression model, we need to change the colors and clarity columns, just like we did for the training data. Since Carat is a continuous variable by default we will leave it untouched.
+
+```{r}
+library(readr)
+offer_diamonds = read_csv("offers.csv")
+
+
+offer_diamonds <- offer_diamonds %>%
+  mutate(Clarity_num = case_when(
+    Clarity == "I2" ~ 10,
+    Clarity == "I1" ~ 9,
+    Clarity == "SI2" ~ 8,
+    Clarity == "SI1" ~ 7,
+    Clarity == "VS2" ~ 6,
+    Clarity == "VS1" ~ 5,
+    Clarity == "VVS2" ~ 4,
+    Clarity == "VVS1" ~ 3,
+    Clarity == "IF" ~ 2,
+    Clarity == "FL" ~ 1,
+    TRUE ~ NA_real_
+  ))
+
+
+offer_diamonds <- offer_diamonds %>%
+  mutate(Color_num = case_when(
+    Color == "Z" ~ 23,
+    Color == "Y" ~ 22,
+    Color == "X" ~ 21,
+    Color == "W" ~ 20,
+    Color == "V" ~ 19,
+    Color == "U" ~ 18,
+    Color == "T" ~ 17,
+    Color == "S" ~ 16,
+    
+    Color == "R" ~ 15,
+    Color == "Q" ~ 14,
+    Color == "P" ~ 13,
+    Color == "O" ~ 12,
+    Color == "N" ~ 11,
+    
+    Color == "M" ~ 10,
+    Color == "L" ~ 9,
+    Color == "K" ~ 8,
+    
+    Color == "J" ~ 7,
+    Color == "I" ~ 6,
+    Color == "H" ~ 5,
+    Color == "G" ~ 4,
+    
+    Color == "F" ~ 3,
+    Color == "E" ~ 2,
+    Color == "D" ~ 1,
+    TRUE ~ NA_real_
+  ))
+
+head(offer_diamonds)
+
+
+```
+
+# Step 5
+
+We will now apply the regression model to the offers file, we can see that the Retail column is now populated with the predicted values of Retail. WE also implement code responsible for calculating profit margins as well as stating exactly how profit is calculated within the context of the data.
+
+```{r}
+predicted_Retail = predict(diamonds_model, newdata = offer_diamonds)
+
+# Make sure the number of rows in predicted_Retail matches the number of rows in offer_diamonds
+predicted_Retail <- predicted_Retail[1:nrow(offer_diamonds)]
+
+# Assign predicted_Retail to offer_diamonds
+offer_diamonds$Retail <- predicted_Retail
+
+
+
+offer_diamonds$Retail = predicted_Retail
+offer_diamonds$Offers <- ifelse(offer_diamonds$Offers > 5000000, 5000000, offer_diamonds$Offers)
+offer_diamonds$Profit = offer_diamonds$Retail - offer_diamonds$Offers
+
+# Set desired profit margin
+profit_margin <- 0.3
+
+# Calculate offers based on profit margin and predicted retail price
+offer_diamonds$Offers <- ifelse(offer_diamonds$Retail > 0, 
+                                offer_diamonds$Retail * (1 - profit_margin),
+                                NA)
+
+
+selected_diamonds <- offer_diamonds %>%
+  filter(Profit > 0, Offers <= 5000000, Profit >= (0.30 * Retail)) %>%
+  arrange(desc(Profit)) %>%
+  head()
+  
+View(selected_diamonds)
+
+
+```
+
+# Analysis :
+Looking at the summary of the linear model we computed we can see that the Multiple R-squared and the adjusted R -Squared values are very similar which tells us that the model is not overfitting the data, which was a primary concern of ours in the beginning.
+
+The F-Stat as well as the p-value tell us more information regarding the overall fit of the model on the data. The p-value of "\< 2-2e-16" tells us the probability of observing the results we obtain assuming the null hypothesis is true. In general a p-value of less than 0.05 is the accepted threshold to conclude that there is a strong statistical significance. Since we have a value of \< 2-2e-16 we can safely assume that the predictor variables being tested on Retail have a strong statistical significance with 95% confidence.
+
+
+
+
+According to our calculations there are only 6 diamonds in the "offers.csv" file that would return an individual profit of 30% or more. These diamonds are: 10728, 10503, 10701, 10722, 10679, 9888 by their id columns respectively. If the profit margins were to be lowered the number of diamonds available would increase, however since we are most focused on generating as much profit as possible these 6 diamonds would generate the most profit given our initial budget of $5,000,000.
+
 
 
 
