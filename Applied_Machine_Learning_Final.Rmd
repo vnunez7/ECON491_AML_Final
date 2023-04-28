@@ -1,15 +1,14 @@
-
 ---
-title: ""| ECON 491 - Applied Machine Learning in Economics\n| Final Project (100pts)"
-  - due date: Thursday, April  27th\n"
+title: "| ECON 491 - Applied Machine Learning in Economics\n| Final Project (100pts) \n|\n"
 author: "Nonso Osamor (cosamor2) & Victoria Nuñez (vnunez7)"
-date: "04/22/2023"
+date: "04/08/2023"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
----------------------------------------------------------
+------------------------------------------------------------------------
+
 
 # Abstract:
 
@@ -34,7 +33,7 @@ Nicolas G. Vaillant, François-Charles Wolff. "Understanding diamond pricing usi
 
 # Data:
 
-The training data and information on diamonds from various retailers was derived from the 
+The training data and information on diamonds from various retailers was derived from the training and offers file linked in the submission folder.
 
 # Applied:
 We are given a trained data set which is what we will be working with in R. Since the file is a csv we do not need to anymore external data conversions, we simply load the data using "read.csv()"
@@ -230,7 +229,7 @@ selected_diamonds <- offer_diamonds %>%
   arrange(desc(Profit)) %>%
   head()
   
-View(selected_diamonds)
+print(selected_diamonds)
 
 
 ```

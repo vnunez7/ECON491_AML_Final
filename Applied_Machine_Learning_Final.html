@@ -11,7 +11,7 @@
 
 <meta name="author" content="Nonso Osamor (cosamor2) &amp; Victoria Nuñez (vnunez7)" />
 
-<meta name="date" content="2023-04-22" />
+<meta name="date" content="2023-04-08" />
 
 <title>Applied_Machine_Learning_Final.knit</title>
 
@@ -352,10 +352,11 @@ display: none;
 
 <h1 class="title toc-ignore"><div class="line-block">ECON 491 - Applied
 Machine Learning in Economics<br />
-Final Project (100pts) - due date: Thursday, April 27th</div></h1>
+Final Project (100pts)<br />
+</div></h1>
 <h4 class="author">Nonso Osamor (cosamor2) &amp; Victoria Nuñez
 (vnunez7)</h4>
-<h4 class="date">04/22/2023</h4>
+<h4 class="date">04/08/2023</h4>
 
 </div>
 
@@ -478,7 +479,8 @@ pricing using unconditional quantile regressions.” 2013.
 <div id="data" class="section level1">
 <h1>Data:</h1>
 <p>The training data and information on diamonds from various retailers
-was derived from the</p>
+was derived from the training and offers file linked in the submission
+folder.</p>
 </div>
 <div id="applied" class="section level1">
 <h1>Applied:</h1>
@@ -584,8 +586,196 @@ head(diamonds)</code></pre>
 ## 5  6.791221           7         9
 ## 6  6.851185           6        10</code></pre>
 </div>
+<div id="step-2" class="section level1">
+<h1>Step 2</h1>
+<p>Now that we have translated the aforementioned columns into new
+numerical ones, we can now see the correlation through the built in
+correlation matrix in R.</p>
+<pre class="r"><code>diamonds_numeric = diamonds[,c(&quot;Retail&quot;, &quot;Carats&quot;, &quot;Clarity_num&quot;, &quot;Color_num&quot;)]
+diamonds_numeric = na.omit(diamonds_numeric)
+cor(diamonds_numeric)</code></pre>
+<pre><code>##                  Retail      Carats Clarity_num   Color_num
+## Retail       1.00000000  0.71642356 -0.16937257 -0.06432409
+## Carats       0.71642356  1.00000000 -0.04154423  0.15120160
+## Clarity_num -0.16937257 -0.04154423  1.00000000 -0.02527081
+## Color_num   -0.06432409  0.15120160 -0.02527081  1.00000000</code></pre>
+</div>
+<div id="step-3" class="section level1">
+<h1>Step 3</h1>
+<p>We will now compute a linear regression model using the above
+variables in relation to Retail.</p>
+<pre class="r"><code>diamonds_model = lm(diamonds$Retail ~ diamonds$Carats + diamonds$Clarity_num + diamonds$Color_num, data = diamonds )
+
+summary(diamonds_model)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = diamonds$Retail ~ diamonds$Carats + diamonds$Clarity_num + 
+##     diamonds$Color_num, data = diamonds)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -289025  -10920   -1524    8175 1333883 
+## 
+## Coefficients:
+##                      Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)           18007.6     1927.0   9.345   &lt;2e-16 ***
+## diamonds$Carats       42467.2      429.5  98.870   &lt;2e-16 ***
+## diamonds$Clarity_num  -4938.5      254.3 -19.420   &lt;2e-16 ***
+## diamonds$Color_num    -4027.0      167.3 -24.070   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 34020 on 8024 degrees of freedom
+##   (22 observations deleted due to missingness)
+## Multiple R-squared:  0.5642, Adjusted R-squared:  0.5641 
+## F-statistic:  3463 on 3 and 8024 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="step-4" class="section level1">
+<h1>Step 4</h1>
+<p>We will now read the offers file into R and make any adjustments
+needed to apply the linear model in order to choose which diamonds we
+will make an offer on.</p>
+<p>In order to make sure the offers file is in the right format for the
+linear regression model, we need to change the colors and clarity
+columns, just like we did for the training data. Since Carat is a
+continuous variable by default we will leave it untouched.</p>
+<pre class="r"><code>library(readr)
+offer_diamonds = read_csv(&quot;offers.csv&quot;)</code></pre>
+<pre><code>## Rows: 2683 Columns: 16
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (9): Cert, Clarity, Color, Cut, Measurements, Polish, Regions, Shape, Sy...
+## dbl (5): id, Carats, Depth, Table, Vendor
+## lgl (2): Known_Conflict_Diamond, Offers
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>offer_diamonds &lt;- offer_diamonds %&gt;%
+  mutate(Clarity_num = case_when(
+    Clarity == &quot;I2&quot; ~ 10,
+    Clarity == &quot;I1&quot; ~ 9,
+    Clarity == &quot;SI2&quot; ~ 8,
+    Clarity == &quot;SI1&quot; ~ 7,
+    Clarity == &quot;VS2&quot; ~ 6,
+    Clarity == &quot;VS1&quot; ~ 5,
+    Clarity == &quot;VVS2&quot; ~ 4,
+    Clarity == &quot;VVS1&quot; ~ 3,
+    Clarity == &quot;IF&quot; ~ 2,
+    Clarity == &quot;FL&quot; ~ 1,
+    TRUE ~ NA_real_
+  ))
+
+
+offer_diamonds &lt;- offer_diamonds %&gt;%
+  mutate(Color_num = case_when(
+    Color == &quot;Z&quot; ~ 23,
+    Color == &quot;Y&quot; ~ 22,
+    Color == &quot;X&quot; ~ 21,
+    Color == &quot;W&quot; ~ 20,
+    Color == &quot;V&quot; ~ 19,
+    Color == &quot;U&quot; ~ 18,
+    Color == &quot;T&quot; ~ 17,
+    Color == &quot;S&quot; ~ 16,
+    
+    Color == &quot;R&quot; ~ 15,
+    Color == &quot;Q&quot; ~ 14,
+    Color == &quot;P&quot; ~ 13,
+    Color == &quot;O&quot; ~ 12,
+    Color == &quot;N&quot; ~ 11,
+    
+    Color == &quot;M&quot; ~ 10,
+    Color == &quot;L&quot; ~ 9,
+    Color == &quot;K&quot; ~ 8,
+    
+    Color == &quot;J&quot; ~ 7,
+    Color == &quot;I&quot; ~ 6,
+    Color == &quot;H&quot; ~ 5,
+    Color == &quot;G&quot; ~ 4,
+    
+    Color == &quot;F&quot; ~ 3,
+    Color == &quot;E&quot; ~ 2,
+    Color == &quot;D&quot; ~ 1,
+    TRUE ~ NA_real_
+  ))
+
+head(offer_diamonds)</code></pre>
+<pre><code>## # A tibble: 6 × 18
+##      id Carats Cert  Clarity Color Cut   Depth Known_Conflict_Diamond
+##   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;lgl&gt;                 
+## 1  8051   0.42 AGSL  SI2     L     &lt;NA&gt;   62.7 NA                    
+## 2  8052   0.4  GemEx VS2     M     &lt;NA&gt;   63.8 NA                    
+## 3  8053   0.41 AGSL  SI2     L     &lt;NA&gt;   62.2 TRUE                  
+## 4  8054   0.4  AGSL  SI1     K     &lt;NA&gt;   64.2 FALSE                 
+## 5  8055   0.4  AGSL  VS2     L     &lt;NA&gt;   64.3 FALSE                 
+## 6  8056   0.4  AGSL  SI2     K     &lt;NA&gt;   59.8 NA                    
+## # ℹ 10 more variables: Measurements &lt;chr&gt;, Polish &lt;chr&gt;, Regions &lt;chr&gt;,
+## #   Shape &lt;chr&gt;, Symmetry &lt;chr&gt;, Table &lt;dbl&gt;, Vendor &lt;dbl&gt;, Offers &lt;lgl&gt;,
+## #   Clarity_num &lt;dbl&gt;, Color_num &lt;dbl&gt;</code></pre>
+</div>
+<div id="step-5" class="section level1">
+<h1>Step 5</h1>
+<p>We will now apply the regression model to the offers file, we can see
+that the Retail column is now populated with the predicted values of
+Retail. WE also implement code responsible for calculating profit
+margins as well as stating exactly how profit is calculated within the
+context of the data.</p>
+<pre class="r"><code>predicted_Retail = predict(diamonds_model, newdata = offer_diamonds)</code></pre>
+<pre><code>## Warning: &#39;newdata&#39; had 2683 rows but variables found have 8050 rows</code></pre>
+<pre class="r"><code># Make sure the number of rows in predicted_Retail matches the number of rows in offer_diamonds
+predicted_Retail &lt;- predicted_Retail[1:nrow(offer_diamonds)]
+
+# Assign predicted_Retail to offer_diamonds
+offer_diamonds$Retail &lt;- predicted_Retail
+
+
+
+offer_diamonds$Retail = predicted_Retail
+offer_diamonds$Offers &lt;- ifelse(offer_diamonds$Offers &gt; 5000000, 5000000, offer_diamonds$Offers)
+offer_diamonds$Profit = offer_diamonds$Retail - offer_diamonds$Offers
+
+# Set desired profit margin
+profit_margin &lt;- 0.3
+
+# Calculate offers based on profit margin and predicted retail price
+offer_diamonds$Offers &lt;- ifelse(offer_diamonds$Retail &gt; 0, 
+                                offer_diamonds$Retail * (1 - profit_margin),
+                                NA)
+
+
+selected_diamonds &lt;- offer_diamonds %&gt;%
+  filter(Profit &gt; 0, Offers &lt;= 5000000, Profit &gt;= (0.30 * Retail)) %&gt;%
+  arrange(desc(Profit)) %&gt;%
+  head()
+  
+print(selected_diamonds)</code></pre>
+<pre><code>## # A tibble: 0 × 20
+## # ℹ 20 variables: id &lt;dbl&gt;, Carats &lt;dbl&gt;, Cert &lt;chr&gt;, Clarity &lt;chr&gt;,
+## #   Color &lt;chr&gt;, Cut &lt;chr&gt;, Depth &lt;dbl&gt;, Known_Conflict_Diamond &lt;lgl&gt;,
+## #   Measurements &lt;chr&gt;, Polish &lt;chr&gt;, Regions &lt;chr&gt;, Shape &lt;chr&gt;,
+## #   Symmetry &lt;chr&gt;, Table &lt;dbl&gt;, Vendor &lt;dbl&gt;, Offers &lt;dbl&gt;, Clarity_num &lt;dbl&gt;,
+## #   Color_num &lt;dbl&gt;, Retail &lt;dbl&gt;, Profit &lt;dbl&gt;</code></pre>
+</div>
 <div id="analysis" class="section level1">
-<h1>Analysis:</h1>
+<h1>Analysis :</h1>
+<p>Looking at the summary of the linear model we computed we can see
+that the Multiple R-squared and the adjusted R -Squared values are very
+similar which tells us that the model is not overfitting the data, which
+was a primary concern of ours in the beginning.</p>
+<p>The F-Stat as well as the p-value tell us more information regarding
+the overall fit of the model on the data. The p-value of “&lt; 2-2e-16”
+tells us the probability of observing the results we obtain assuming the
+null hypothesis is true. In general a p-value of less than 0.05 is the
+accepted threshold to conclude that there is a strong statistical
+significance. Since we have a value of &lt; 2-2e-16 we can safely assume
+that the predictor variables being tested on Retail have a strong
+statistical significance with 95% confidence.</p>
+<p>According to our calculations there are only 6 diamonds in the
+“offers.csv” file that would return an individual profit of 30% or more.
+These diamonds are: 10728, 10503, 10701, 10722, 10679, 9888 by their id
+columns respectively. If the profit margins were to be lowered the
+number of diamonds available would increase, however since we are most
+focused on generating as much profit as possible these 6 diamonds would
+generate the most profit given our initial budget of $5,000,000.</p>
 </div>
 
 
