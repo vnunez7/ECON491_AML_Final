@@ -405,18 +405,18 @@ to produce synthetic diamonds, which have a larger demand but have
 distinctions with natural gemstones. Between synthetic and natural
 diamonds, the cost of artificially produced diamonds appear to cost
 cheaper than natural diamonds, which is the result of production costs,
-availability, and market demand. As jewelers and diamond wholesalers
-continue to develop retail costs for the commodity, there appears to be
-an unclear criteria for what conditions of the diamond cause an increase
-or decrease in value. The cost of jewelry products that contain diamonds
-and the commodity themselves seem to hold a fluctuating value in the
-United States economy, which emphasizes several characteristics of the
-gemstone themselves impact the retail cost. Our project aims to dig
-deeper into the regressors or potentially influential characteristics of
-a diamond that lead to a higher market place as a luxury good, and
-develop a statistical model that would allow us to make predictions
-about the market value of a diamond based on its physical
-characteristics.</p>
+availability, and market demand. (Berrada) As jewelers and diamond
+wholesalers continue to develop retail costs for the commodity, there
+appears to be an unclear criteria for what conditions of the diamond
+cause an increase or decrease in value. The cost of jewelry products
+that contain diamonds and the commodity themselves seem to hold a
+fluctuating value in the United States economy, which emphasizes several
+characteristics of the gemstone themselves impact the retail cost. Our
+project aims to dig deeper into the regressors or potentially
+influential characteristics of a diamond that lead to a higher market
+place as a luxury good, and develop a statistical model that would allow
+us to make predictions about the market value of a diamond based on its
+physical characteristics.</p>
 <p>The several characteristics of diamonds discussed within our project
 include the shape, carat, symmetry, color, and clarity of diamonds. The
 shape of diamonds ranges based on the desired appearance of the gemstone
@@ -467,6 +467,8 @@ of diamond retail cost.</p>
 </div>
 <div id="citations" class="section level1">
 <h1>Citations:</h1>
+<p>Berrada, Meryem. “How Are Diamonds Made?” Ask An Earth and Space
+Scientist, Ask An Anthropologist | ASU, 25 June 2019, <a href="https://askanearthspacescientist.asu.edu/top-question/diamonds-made" class="uri">https://askanearthspacescientist.asu.edu/top-question/diamonds-made</a>.</p>
 <p>Mamonov Stanislav, Tamilla Triantoro. “Subjectivity of Diamond Prices
 in Online Retail: Insights from a Data Mining Study.” Journal of
 Theoretical and Applied Electronic Commerce Research, vol. 13, no. 2,
@@ -475,22 +477,20 @@ Theoretical and Applied Electronic Commerce Research, vol. 13, no. 2,
 pricing using unconditional quantile regressions.” 2013.
 ⟨halshs-00853384⟩</p>
 </div>
-<div id="data" class="section level1">
-<h1>Data:</h1>
-<p>The training data and information on diamonds from various retailers
-was derived from the</p>
-</div>
 <div id="applied" class="section level1">
 <h1>Applied:</h1>
 <p>We are given a trained data set which is what we will be working with
 in R. Since the file is a csv we do not need to anymore external data
 conversions, we simply load the data using “read.csv()”</p>
-<p>In order to correlate Color, Clarity, and Carat to Retail, we need to
-check if all the values in those respective columns are numerical
-values,we do this by using the typeof() function. If they are not we
-need to manipulate the values further. My implementation of translating
-the categorical values of Color and Clarity into numerical values an be
-seen below.</p>
+<p>The graphics displayed for our project utilize the XQuartz library
+which can be installed at <a href="https://www.xquartz.org/" class="uri">https://www.xquartz.org/</a>.</p>
+<p>In order to correlate Color, Clarity, and Carat to Retail Price, we
+need to check if all the values in those respective columns are
+numerical values,we do this by using the typeof() function. If they are
+not we need to manipulate the values further. The implementation of
+translating the categorical values of Color and Clarity into numerical
+values an be seen below.</p>
+
 <pre class="r"><code>library(dplyr)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;dplyr&#39;</code></pre>
