@@ -482,6 +482,107 @@ was derived from the</p>
 </div>
 <div id="applied" class="section level1">
 <h1>Applied:</h1>
+<p>We are given a trained data set which is what we will be working with
+in R. Since the file is a csv we do not need to anymore external data
+conversions, we simply load the data using “read.csv()”</p>
+<p>In order to correlate Color, Clarity, and Carat to Retail, we need to
+check if all the values in those respective columns are numerical
+values,we do this by using the typeof() function. If they are not we
+need to manipulate the values further. My implementation of translating
+the categorical values of Color and Clarity into numerical values an be
+seen below.</p>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>diamonds = read.csv(&quot;training.csv&quot;)
+View(diamonds)
+
+typeof(diamonds$Retail)</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<pre class="r"><code>typeof(diamonds$Carats)</code></pre>
+<pre><code>## [1] &quot;double&quot;</code></pre>
+<pre class="r"><code>typeof(diamonds$Clarity)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>typeof(diamonds$Color)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>diamonds &lt;- diamonds %&gt;%
+  mutate(Clarity_num = case_when(
+    Clarity == &quot;I2&quot; ~ 10,
+    Clarity == &quot;I1&quot; ~ 9,
+    Clarity == &quot;SI2&quot; ~ 8,
+    Clarity == &quot;SI1&quot; ~ 7,
+    Clarity == &quot;VS2&quot; ~ 6,
+    Clarity == &quot;VS1&quot; ~ 5,
+    Clarity == &quot;VVS2&quot; ~ 4,
+    Clarity == &quot;VVS1&quot; ~ 3,
+    Clarity == &quot;IF&quot; ~ 2,
+    Clarity == &quot;FL&quot; ~ 1,
+    TRUE ~ NA_real_
+  ))
+
+
+diamonds &lt;- diamonds %&gt;%
+  mutate(Color_num = case_when(
+    Color == &quot;Z&quot; ~ 23,
+    Color == &quot;Y&quot; ~ 22,
+    Color == &quot;X&quot; ~ 21,
+    Color == &quot;W&quot; ~ 20,
+    Color == &quot;V&quot; ~ 19,
+    Color == &quot;U&quot; ~ 18,
+    Color == &quot;T&quot; ~ 17,
+    Color == &quot;S&quot; ~ 16,
+    
+    Color == &quot;R&quot; ~ 15,
+    Color == &quot;Q&quot; ~ 14,
+    Color == &quot;P&quot; ~ 13,
+    Color == &quot;O&quot; ~ 12,
+    Color == &quot;N&quot; ~ 11,
+    
+    Color == &quot;M&quot; ~ 10,
+    Color == &quot;L&quot; ~ 9,
+    Color == &quot;K&quot; ~ 8,
+    
+    Color == &quot;J&quot; ~ 7,
+    Color == &quot;I&quot; ~ 6,
+    Color == &quot;H&quot; ~ 5,
+    Color == &quot;G&quot; ~ 4,
+    
+    Color == &quot;F&quot; ~ 3,
+    Color == &quot;E&quot; ~ 2,
+    Color == &quot;D&quot; ~ 1,
+    TRUE ~ NA_real_
+  ))
+
+
+
+head(diamonds)</code></pre>
+<pre><code>##   id Carats Cert Clarity Color Cut Depth Known_Conflict_Diamond   Measurements
+## 1  1   0.41 &lt;NA&gt;     SI1     L      65.4                  FALSE 4.65x4.62x3.03
+## 2  2   0.42 AGSL     SI2     L      61.7                  FALSE 4.85x4.79x2.98
+## 3  3   0.40 AGSL     SI1     L      64.0                  FALSE 4.66x4.63x2.97
+## 4  4   0.41 AGSL     SI2     L      62.7                  FALSE 4.71x4.69x2.95
+## 5  5   0.40 AGSL     SI1     L      63.0                  FALSE 4.71x4.68x2.96
+## 6  6   0.40 AGSL     VS2     M      59.9                  FALSE 4.75x4.74x2.84
+##      Polish       Regions    Shape  Symmetry Table Vendor Price Retail LogPrice
+## 1 Very good Other/Unknown Princess      Good    NA      1   430    850 6.063785
+## 2 Excellent        Russia Marquise Very good    NA      1   560    920 6.327937
+## 3 Excellent  South Africa    Round Excellent    57      1   560    575 6.327937
+## 4 Very good      Botswana    Round Very good    58      1   560    825 6.327937
+## 5 Excellent      Botswana    Round Very good    58      1   580    890 6.363028
+## 6 Very good      Botswana    Round Very good    64      1   580    945 6.363028
+##   LogRetail Clarity_num Color_num
+## 1  6.745236           7         9
+## 2  6.824374           8         9
+## 3  6.354370           7         9
+## 4  6.715383           8         9
+## 5  6.791221           7         9
+## 6  6.851185           6        10</code></pre>
 </div>
 <div id="analysis" class="section level1">
 <h1>Analysis:</h1>
